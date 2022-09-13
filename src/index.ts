@@ -122,6 +122,7 @@ async function sync(repo_str: string): Promise<void> {
     info(indicator);
   } catch (e: any) {
     warn(`${indicator}: ${e.message}`);
+    throw e;
   }
 }
 
@@ -159,7 +160,10 @@ async function sync(repo_str: string): Promise<void> {
     REPOSITORIES.split("\n").forEach((repo_str) => {
       promises.push(sync(repo_str));
     });
-    await Promise.allSettled(promises);
+    const results = await Promise.allSettled(promises);
+    if (results.some((result) => result.status === "rejected")) {
+      throw new Error("Failed");
+    }
   } catch (e: any) {
     error(e.message);
   }

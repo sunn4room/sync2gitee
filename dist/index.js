@@ -21386,6 +21386,7 @@ async function sync(repo_str) {
     }
     catch (e) {
         warn(`${indicator}: ${e.message}`);
+        throw e;
     }
 }
 (async function () {
@@ -21416,7 +21417,10 @@ async function sync(repo_str) {
         REPOSITORIES.split("\n").forEach((repo_str) => {
             promises$1.push(sync(repo_str));
         });
-        await Promise.allSettled(promises$1);
+        const results = await Promise.allSettled(promises$1);
+        if (results.some((result) => result.status === "rejected")) {
+            throw new Error("Failed");
+        }
     }
     catch (e) {
         error(e.message);
