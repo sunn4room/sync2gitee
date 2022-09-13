@@ -2,7 +2,7 @@ name: Sync Github Repositories To Gitee
 on:
   push:
   schedule:
-    - cron: "0 16 * * *"
+    - cron: '0 16 * * *'
 
 jobs:
   build:
@@ -27,6 +27,7 @@ jobs:
             Ulauncher/Ulauncher@v6
             vuejs/core->vue3
             plantuml/plantuml
+            facebook/react
           gitee-private-key: ${{ secrets.GITEE_PRIVATE_KEY }}
           gitee-token: ${{ secrets.GITEE_TOKEN }}
           gitee-org: sunn4mirror

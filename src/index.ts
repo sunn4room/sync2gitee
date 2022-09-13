@@ -112,6 +112,51 @@ async function sync(repo_str: string): Promise<void> {
   }
 }
 
+export class LimitPromise {
+  private limit: number
+  private count: number
+  private taskQueue: any[]
+
+  constructor(limit: number) {
+    this.limit = limit
+    this.count = 0
+    this.taskQueue = []
+  }
+
+  private createTask(
+    asyncFn: Function,
+    args: any[],
+    resolve: (value: void) => void,
+    reject: (reason?: any) => void
+  ) {
+    return () => {
+      asyncFn(...args)
+        .then(resolve)
+        .catch(reject)
+        .finally(() => {
+          this.count--
+          if (this.taskQueue.length) {
+            let task = this.taskQueue.shift()
+            task()
+          }
+        })
+
+      this.count++
+    }
+  }
+
+  public call(asyncFn: Function, ...args: any[]) {
+    return new Promise<void>((resolve, reject) => {
+      const task = this.createTask(asyncFn, args, resolve, reject)
+      if (this.count >= this.limit) {
+        this.taskQueue.push(task)
+      } else {
+        task()
+      }
+    })
+  }
+}
+
 ;(async function () {
   try {
     info('validating gitee organization')
@@ -143,8 +188,9 @@ async function sync(repo_str: string): Promise<void> {
     await chmod(knownHostsFile, '644')
 
     const promises: Promise<void>[] = []
+    const promise_limiter = new LimitPromise(5)
     REPOSITORIES.split('\n').forEach((repo_str) => {
-      promises.push(sync(repo_str))
+      promises.push(promise_limiter.call(sync, repo_str))
     })
     const results = await Promise.allSettled(promises)
     if (results.some((result) => result.status === 'rejected')) {
