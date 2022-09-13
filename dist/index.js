@@ -16603,7 +16603,7 @@ function info(msg) {
 }
 const gitee = axios.create({
     baseURL: "https://gitee.com/api/v5/",
-    timeout: 1000,
+    timeout: 10000,
     headers: {
         "Content-Type": "application/json",
         charset: "UTF-8",
