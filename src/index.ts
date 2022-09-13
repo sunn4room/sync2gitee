@@ -79,8 +79,6 @@ async function gitee_api(url: string, data: any = undefined) {
 }
 
 async function sync(repo_str: string): Promise<void> {
-  info(repo_str);
-
   let cut = repo_str.split("->");
   repo_str = cut[0];
   let repo_name = cut.length === 1 ? "" : cut[1];
@@ -91,40 +89,41 @@ async function sync(repo_str: string): Promise<void> {
     repo_name = repo.split("/")[1];
   }
   const indicator = `${repo} --${repo_branch}--> ${GITEE_ORG}/${repo_name}`;
+  info(indicator);
 
-  try {
-    if (!(await gitee_api(`/repos/${GITEE_ORG}/${repo_name}`))) {
-      if (!(await gitee_api(`/orgs/${GITEE_ORG}/repos`, { name: repo_name }))) {
-        throw new Error("cannot create gitee repository");
-      }
-    }
+  // try {
+  //   if (!(await gitee_api(`/repos/${GITEE_ORG}/${repo_name}`))) {
+  //     if (!(await gitee_api(`/orgs/${GITEE_ORG}/repos`, { name: repo_name }))) {
+  //       throw new Error("cannot create gitee repository");
+  //     }
+  //   }
 
-    const tempdir = await mkdtemp(path.join(os.tmpdir(), "repo-"));
-    if (repo_branch === "") {
-      await execa("git", ["clone", `https://github/${repo}.git`, tempdir]);
-    } else {
-      await execa("git", [
-        "clone",
-        "--branch",
-        repo_branch,
-        `https://github/${repo}.git`,
-        tempdir,
-      ]);
-    }
+  //   const tempdir = await mkdtemp(path.join(os.tmpdir(), "repo-"));
+  //   if (repo_branch === "") {
+  //     await execa("git", ["clone", `https://github/${repo}.git`, tempdir]);
+  //   } else {
+  //     await execa("git", [
+  //       "clone",
+  //       "--branch",
+  //       repo_branch,
+  //       `https://github/${repo}.git`,
+  //       tempdir,
+  //     ]);
+  //   }
 
-    await execa(
-      "git",
-      ["remote", "add", "gitee", `git@gitee.com:${GITEE_ORG}/${repo_name}.git`],
-      {
-        cwd: tempdir,
-      }
-    );
-    await execa("git", ["push", "-f", "gitee"], { cwd: tempdir });
+  //   await execa(
+  //     "git",
+  //     ["remote", "add", "gitee", `git@gitee.com:${GITEE_ORG}/${repo_name}.git`],
+  //     {
+  //       cwd: tempdir,
+  //     }
+  //   );
+  //   await execa("git", ["push", "-f", "gitee"], { cwd: tempdir });
 
-    info(indicator);
-  } catch (e: any) {
-    warn(`${indicator}: ${e.message}`);
-  }
+  //   info(indicator);
+  // } catch (e: any) {
+  //   warn(`${indicator}: ${e.message}`);
+  // }
 }
 
 (async function () {

@@ -21359,34 +21359,37 @@ async function sync(repo_str) {
         repo_name = repo.split("/")[1];
     }
     const indicator = `${repo} --${repo_branch}--> ${GITEE_ORG}/${repo_name}`;
-    try {
-        if (!(await gitee_api(`/repos/${GITEE_ORG}/${repo_name}`))) {
-            if (!(await gitee_api(`/orgs/${GITEE_ORG}/repos`, { name: repo_name }))) {
-                throw new Error("cannot create gitee repository");
-            }
-        }
-        const tempdir = await promises.mkdtemp(require$$0__default$3["default"].join(require$$0__default$5["default"].tmpdir(), "repo-"));
-        if (repo_branch === "") {
-            await execa("git", ["clone", `https://github/${repo}.git`, tempdir]);
-        }
-        else {
-            await execa("git", [
-                "clone",
-                "--branch",
-                repo_branch,
-                `https://github/${repo}.git`,
-                tempdir,
-            ]);
-        }
-        await execa("git", ["remote", "add", "gitee", `git@gitee.com:${GITEE_ORG}/${repo_name}.git`], {
-            cwd: tempdir,
-        });
-        await execa("git", ["push", "-f", "gitee"], { cwd: tempdir });
-        info(indicator);
-    }
-    catch (e) {
-        warn(`${indicator}: ${e.message}`);
-    }
+    info(indicator);
+    // try {
+    //   if (!(await gitee_api(`/repos/${GITEE_ORG}/${repo_name}`))) {
+    //     if (!(await gitee_api(`/orgs/${GITEE_ORG}/repos`, { name: repo_name }))) {
+    //       throw new Error("cannot create gitee repository");
+    //     }
+    //   }
+    //   const tempdir = await mkdtemp(path.join(os.tmpdir(), "repo-"));
+    //   if (repo_branch === "") {
+    //     await execa("git", ["clone", `https://github/${repo}.git`, tempdir]);
+    //   } else {
+    //     await execa("git", [
+    //       "clone",
+    //       "--branch",
+    //       repo_branch,
+    //       `https://github/${repo}.git`,
+    //       tempdir,
+    //     ]);
+    //   }
+    //   await execa(
+    //     "git",
+    //     ["remote", "add", "gitee", `git@gitee.com:${GITEE_ORG}/${repo_name}.git`],
+    //     {
+    //       cwd: tempdir,
+    //     }
+    //   );
+    //   await execa("git", ["push", "-f", "gitee"], { cwd: tempdir });
+    //   info(indicator);
+    // } catch (e: any) {
+    //   warn(`${indicator}: ${e.message}`);
+    // }
 }
 (async function () {
     try {
@@ -21413,9 +21416,9 @@ async function sync(repo_str) {
         await promises.appendFile(knownHostsFile, stdout);
         await promises.chmod(knownHostsFile, "644");
         const promises$1 = [];
-        for (let repo_str in REPOSITORIES.split("\n")) {
+        REPOSITORIES.split("\n").forEach((repo_str) => {
             promises$1.push(sync(repo_str));
-        }
+        });
         await Promise.allSettled(promises$1);
     }
     catch (e) {
