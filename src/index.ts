@@ -99,7 +99,7 @@ async function sync(repo_str: string): Promise<void> {
 
     const tempdir = await mkdtemp(path.join(os.tmpdir(), "repo-"));
     if (repo_branch === "") {
-      await execa("git", ["clone", `https://github/${repo}.git`, tempdir]);
+      await execa("git", ["clone", `https://github.com/${repo}.git`, tempdir]);
     } else {
       await execa("git", [
         "clone",

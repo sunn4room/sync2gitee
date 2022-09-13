@@ -21367,7 +21367,7 @@ async function sync(repo_str) {
         }
         const tempdir = await promises.mkdtemp(require$$0__default$3["default"].join(require$$0__default$5["default"].tmpdir(), "repo-"));
         if (repo_branch === "") {
-            await execa("git", ["clone", `https://github/${repo}.git`, tempdir]);
+            await execa("git", ["clone", `https://github.com/${repo}.git`, tempdir]);
         }
         else {
             await execa("git", [
