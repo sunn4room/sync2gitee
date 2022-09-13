@@ -59,7 +59,6 @@ async function access_gitee_api(
       if (e.response) {
         return false;
       } else if (e.request) {
-        console.log(e.request);
         counter++;
       } else {
         throw e;
