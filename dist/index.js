@@ -21285,7 +21285,6 @@ function execa(file, args, options) {
 const REPOSITORIES = coreExports.getInput("repositories", {
     required: true,
 });
-console.log(REPOSITORIES);
 const GITEE_PRIVATE_KEY = coreExports.getInput("gitee-private-key", {
     required: true,
 });
@@ -21374,7 +21373,7 @@ async function sync(repo_str) {
                 "clone",
                 "--branch",
                 repo_branch,
-                `https://github/${repo}.git`,
+                `https://github.com/${repo}.git`,
                 tempdir,
             ]);
         }

@@ -8,7 +8,6 @@ import { execa } from "execa";
 const REPOSITORIES = core.getInput("repositories", {
   required: true,
 });
-console.log(REPOSITORIES);
 const GITEE_PRIVATE_KEY = core.getInput("gitee-private-key", {
   required: true,
 });
@@ -105,7 +104,7 @@ async function sync(repo_str: string): Promise<void> {
         "clone",
         "--branch",
         repo_branch,
-        `https://github/${repo}.git`,
+        `https://github.com/${repo}.git`,
         tempdir,
       ]);
     }
