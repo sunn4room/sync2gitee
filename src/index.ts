@@ -156,9 +156,9 @@ async function sync(repo_str: string): Promise<void> {
     await chmod(knownHostsFile, "644");
 
     const promises: Promise<void>[] = [];
-    for (let repo_str in REPOSITORIES.split("\n")) {
+    REPOSITORIES.split("\n").forEach((repo_str) => {
       promises.push(sync(repo_str));
-    }
+    });
     await Promise.allSettled(promises);
   } catch (e: any) {
     error(e.message);
