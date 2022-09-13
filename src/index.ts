@@ -91,8 +91,8 @@ async function sync(repo_str: string): Promise<void> {
   const indicator = `${repo} --${repo_branch}--> ${GITEE_ORG}/${repo_name}`;
 
   try {
-    if (!gitee_api(`/repos/${GITEE_ORG}/${repo_name}`)) {
-      if (!gitee_api(`/orgs/${GITEE_ORG}/repos`, { name: repo_name })) {
+    if (!(await gitee_api(`/repos/${GITEE_ORG}/${repo_name}`))) {
+      if (!(await gitee_api(`/orgs/${GITEE_ORG}/repos`, { name: repo_name }))) {
         throw new Error("cannot create gitee repository");
       }
     }
@@ -110,16 +110,18 @@ async function sync(repo_str: string): Promise<void> {
       ]);
     }
 
-    const gitee_repo = `git@gitee.com:${GITEE_ORG}/${repo_name}.git`;
-
-    await execa("git", ["remote", "add", "gitee", gitee_repo], {
-      cwd: tempdir,
-    });
+    await execa(
+      "git",
+      ["remote", "add", "gitee", `git@gitee.com:${GITEE_ORG}/${repo_name}.git`],
+      {
+        cwd: tempdir,
+      }
+    );
     await execa("git", ["push", "-f", "gitee"], { cwd: tempdir });
 
     info(indicator);
   } catch (e: any) {
-    warn(indicator);
+    warn(`${indicator}: ${e.message}`);
   }
 }
 
@@ -153,12 +155,11 @@ async function sync(repo_str: string): Promise<void> {
     await appendFile(knownHostsFile, stdout);
     await chmod(knownHostsFile, "644");
 
-    console.log(REPOSITORIES.split("\n"));
-    // const promises: Promise<void>[] = [];
-    // for (let repo_str in REPOSITORIES.split("\n")) {
-    //   promises.push(sync(repo_str));
-    // }
-    // await Promise.allSettled(promises);
+    const promises: Promise<void>[] = [];
+    for (let repo_str in REPOSITORIES.split("\n")) {
+      promises.push(sync(repo_str));
+    }
+    await Promise.allSettled(promises);
   } catch (e: any) {
     error(e.message);
   }

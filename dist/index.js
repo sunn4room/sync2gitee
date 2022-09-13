@@ -19278,7 +19278,7 @@ if (process.platform === 'win32' || commonjsGlobal.TESTING_WINDOWS) {
 }
 
 var isexe_1 = isexe$1;
-isexe$1.sync = sync;
+isexe$1.sync = sync$1;
 
 function isexe$1 (path, options, cb) {
   if (typeof options === 'function') {
@@ -19314,7 +19314,7 @@ function isexe$1 (path, options, cb) {
   });
 }
 
-function sync (path, options) {
+function sync$1 (path, options) {
   // my kingdom for a filtered catch
   try {
     return core.sync(path, options || {})
@@ -21348,6 +21348,46 @@ async function gitee_api(url, data = undefined) {
         return await access_gitee_api("get", url);
     }
 }
+async function sync(repo_str) {
+    let cut = repo_str.split("->");
+    repo_str = cut[0];
+    let repo_name = cut.length === 1 ? "" : cut[1];
+    cut = repo_str.split("@");
+    let repo_branch = cut.length === 1 ? "" : cut[1];
+    let repo = cut[0];
+    if (repo_name === "") {
+        repo_name = repo.split("/")[1];
+    }
+    const indicator = `${repo} --${repo_branch}--> ${GITEE_ORG}/${repo_name}`;
+    try {
+        if (!(await gitee_api(`/repos/${GITEE_ORG}/${repo_name}`))) {
+            if (!(await gitee_api(`/orgs/${GITEE_ORG}/repos`, { name: repo_name }))) {
+                throw new Error("cannot create gitee repository");
+            }
+        }
+        const tempdir = await promises.mkdtemp(require$$0__default$3["default"].join(require$$0__default$5["default"].tmpdir(), "repo-"));
+        if (repo_branch === "") {
+            await execa("git", ["clone", `https://github/${repo}.git`, tempdir]);
+        }
+        else {
+            await execa("git", [
+                "clone",
+                "--branch",
+                repo_branch,
+                `https://github/${repo}.git`,
+                tempdir,
+            ]);
+        }
+        await execa("git", ["remote", "add", "gitee", `git@gitee.com:${GITEE_ORG}/${repo_name}.git`], {
+            cwd: tempdir,
+        });
+        await execa("git", ["push", "-f", "gitee"], { cwd: tempdir });
+        info(indicator);
+    }
+    catch (e) {
+        warn(`${indicator}: ${e.message}`);
+    }
+}
 (async function () {
     try {
         info("validating gitee organization");
@@ -21372,12 +21412,11 @@ async function gitee_api(url, data = undefined) {
         const { stdout } = await execa("ssh-keyscan", ["gitee.com"]);
         await promises.appendFile(knownHostsFile, stdout);
         await promises.chmod(knownHostsFile, "644");
-        console.log(REPOSITORIES.split("\n"));
-        // const promises: Promise<void>[] = [];
-        // for (let repo_str in REPOSITORIES.split("\n")) {
-        //   promises.push(sync(repo_str));
-        // }
-        // await Promise.allSettled(promises);
+        const promises$1 = [];
+        for (let repo_str in REPOSITORIES.split("\n")) {
+            promises$1.push(sync(repo_str));
+        }
+        await Promise.allSettled(promises$1);
     }
     catch (e) {
         error(e.message);
