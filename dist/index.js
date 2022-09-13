@@ -21351,9 +21351,12 @@ async function gitee_api(url, data = undefined) {
 (async function () {
     try {
         info("validating gitee organization");
-        if (!gitee_api(`/orgs/${GITEE_ORG}`)) {
+        if (!(await gitee_api(`/orgs/${GITEE_ORG}`))) {
             warn("creating gitee organization");
-            if (!gitee_api("/users/organization", { name: GITEE_ORG, org: GITEE_ORG })) {
+            if (!(await gitee_api("/users/organization", {
+                name: GITEE_ORG,
+                org: GITEE_ORG,
+            }))) {
                 throw new Error("cannot create gitee organization");
             }
         }
@@ -21369,6 +21372,7 @@ async function gitee_api(url, data = undefined) {
         const { stdout } = await execa("ssh-keyscan", ["gitee.com"]);
         await promises.appendFile(knownHostsFile, stdout);
         await promises.chmod(knownHostsFile, "644");
+        console.log(REPOSITORIES.split("\n"));
         // const promises: Promise<void>[] = [];
         // for (let repo_str in REPOSITORIES.split("\n")) {
         //   promises.push(sync(repo_str));
@@ -21376,7 +21380,6 @@ async function gitee_api(url, data = undefined) {
         // await Promise.allSettled(promises);
     }
     catch (e) {
-        console.log(1234);
         error(e.message);
     }
 })();

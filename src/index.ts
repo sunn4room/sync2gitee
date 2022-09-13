@@ -126,10 +126,13 @@ async function sync(repo_str: string): Promise<void> {
 (async function () {
   try {
     info("validating gitee organization");
-    if (!gitee_api(`/orgs/${GITEE_ORG}`)) {
+    if (!(await gitee_api(`/orgs/${GITEE_ORG}`))) {
       warn("creating gitee organization");
       if (
-        !gitee_api("/users/organization", { name: GITEE_ORG, org: GITEE_ORG })
+        !(await gitee_api("/users/organization", {
+          name: GITEE_ORG,
+          org: GITEE_ORG,
+        }))
       ) {
         throw new Error("cannot create gitee organization");
       }
@@ -150,13 +153,13 @@ async function sync(repo_str: string): Promise<void> {
     await appendFile(knownHostsFile, stdout);
     await chmod(knownHostsFile, "644");
 
+    console.log(REPOSITORIES.split("\n"));
     // const promises: Promise<void>[] = [];
     // for (let repo_str in REPOSITORIES.split("\n")) {
     //   promises.push(sync(repo_str));
     // }
     // await Promise.allSettled(promises);
   } catch (e: any) {
-    console.log(1234);
     error(e.message);
   }
 })();
