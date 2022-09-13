@@ -4,12 +4,14 @@
   "description": "sync github repositories to gitee",
   "main": "dist/index.js",
   "scripts": {
+    "pack": "rollup -c",
     "start": "rollup -c && node dist/index.js"
   },
   "author": "sunn4room",
   "license": "MIT",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^22.0.2",
+    "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^14.0.1",
     "@rollup/plugin-typescript": "^8.5.0",
     "@types/node": "^18.7.16",

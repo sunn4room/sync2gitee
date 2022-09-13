@@ -2,20 +2,20 @@ import os from "os";
 import path from "path";
 import { mkdir, appendFile, chmod, mkdtemp } from "fs/promises";
 import axios from "axios";
-import action from "@actions/core";
+import core from "@actions/core";
 import { execa } from "execa";
 
-const REPOSITORIES = action.getInput("repositories", {
+const REPOSITORIES = core.getInput("repositories", {
   required: true,
 });
 console.log(REPOSITORIES);
-const GITEE_PRIVATE_KEY = action.getInput("gitee-private-key", {
+const GITEE_PRIVATE_KEY = core.getInput("gitee-private-key", {
   required: true,
 });
-const GITEE_TOKEN = action.getInput("gitee-token", {
+const GITEE_TOKEN = core.getInput("gitee-token", {
   required: true,
 });
-const GITEE_ORG = action.getInput("gitee-org", {
+const GITEE_ORG = core.getInput("gitee-org", {
   required: true,
 });
 
@@ -123,7 +123,6 @@ async function sync(repo_str: string): Promise<void> {
   }
 }
 
-// main function
 (async function () {
   try {
     info("validating gitee organization");
@@ -138,7 +137,7 @@ async function sync(repo_str: string): Promise<void> {
 
     info("starting ssh-agent");
     await execa("ssh-agent", ["-a", "/tmp/ssh-auth.sock"]);
-    action.exportVariable("SSH_AUTH_SOCK", "/tmp/ssh-auth.sock");
+    core.exportVariable("SSH_AUTH_SOCK", "/tmp/ssh-auth.sock");
 
     info("adding gitee private key");
     await execa("ssh-add", ["-"], { input: GITEE_PRIVATE_KEY });
