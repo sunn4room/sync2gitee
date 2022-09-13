@@ -21306,7 +21306,7 @@ function error(msg) {
     process.exit(1);
 }
 const gitee = axios.create({
-    baseURL: "https://giteeeee.com/api/v5/",
+    baseURL: "https://gitee.com/api/v5/",
     timeout: 10000,
     headers: {
         "Content-Type": "application/json",
