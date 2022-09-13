@@ -1,0 +1,14 @@
+name: "Sync Github repositories to Gitee"
+author: "sunn4room"
+inputs:
+  repositories:
+    required: true
+  gitee-private-key:
+    required: true
+  gitee-token:
+    required: true
+  gitee-org:
+    required: true
+runs:
+  using: "node16"
+  main: "dist/index.js"
