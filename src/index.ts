@@ -79,6 +79,8 @@ async function gitee_api(url: string, data: any = undefined) {
 }
 
 async function sync(repo_str: string): Promise<void> {
+  info(repo_str);
+
   let cut = repo_str.split("->");
   repo_str = cut[0];
   let repo_name = cut.length === 1 ? "" : cut[1];
