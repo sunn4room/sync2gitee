@@ -21329,6 +21329,7 @@ async function access_gitee_api(method, url, data = undefined) {
                 return false;
             }
             else if (e.request) {
+                console.log(e.request);
                 counter++;
             }
             else {
