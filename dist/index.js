@@ -1,5 +1,7 @@
 'use strict';
 
+Object.defineProperty(exports, '__esModule', { value: true });
+
 var require$$0$6 = require('os');
 var require$$0$4 = require('path');
 var promises = require('fs/promises');
@@ -21373,6 +21375,42 @@ async function sync(repo_str) {
         throw e;
     }
 }
+class LimitPromise {
+    limit;
+    count;
+    taskQueue;
+    constructor(limit) {
+        this.limit = limit;
+        this.count = 0;
+        this.taskQueue = [];
+    }
+    createTask(asyncFn, args, resolve, reject) {
+        return () => {
+            asyncFn(...args)
+                .then(resolve)
+                .catch(reject)
+                .finally(() => {
+                this.count--;
+                if (this.taskQueue.length) {
+                    let task = this.taskQueue.shift();
+                    task();
+                }
+            });
+            this.count++;
+        };
+    }
+    call(asyncFn, ...args) {
+        return new Promise((resolve, reject) => {
+            const task = this.createTask(asyncFn, args, resolve, reject);
+            if (this.count >= this.limit) {
+                this.taskQueue.push(task);
+            }
+            else {
+                task();
+            }
+        });
+    }
+}
 (async function () {
     try {
         info('validating gitee organization');
@@ -21397,9 +21435,13 @@ async function sync(repo_str) {
         const { stdout } = await execa('ssh-keyscan', ['gitee.com']);
         await promises.appendFile(knownHostsFile, stdout);
         await promises.chmod(knownHostsFile, '644');
+        info('setting git timeout');
+        await execa('git', ['config', '--global', 'http.lowSpeedLimit', '1000']);
+        await execa('git', ['config', '--global', 'http.lowSpeedTime', '60']);
         const promises$1 = [];
+        const promise_limiter = new LimitPromise(5);
         REPOSITORIES.split('\n').forEach((repo_str) => {
-            promises$1.push(sync(repo_str));
+            promises$1.push(promise_limiter.call(sync, repo_str));
         });
         const results = await Promise.allSettled(promises$1);
         if (results.some((result) => result.status === 'rejected')) {
@@ -21410,3 +21452,5 @@ async function sync(repo_str) {
         error(e.message);
     }
 })();
+
+exports.LimitPromise = LimitPromise;
