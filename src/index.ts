@@ -187,6 +187,10 @@ export class LimitPromise {
     await appendFile(knownHostsFile, stdout)
     await chmod(knownHostsFile, '644')
 
+    info('setting git timeout')
+    await execa('git', ['config', '--global', 'http.lowSpeedLimit', '1000'])
+    await execa('git', ['config', '--global', 'http.lowSpeedTime', '60'])
+
     const promises: Promise<void>[] = []
     const promise_limiter = new LimitPromise(5)
     REPOSITORIES.split('\n').forEach((repo_str) => {
