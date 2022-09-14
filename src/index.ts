@@ -1,6 +1,6 @@
 import os from 'os'
 import path from 'path'
-import { mkdir, appendFile, chmod, mkdtemp } from 'fs/promises'
+import { mkdir, writeFile, chmod, mkdtemp } from 'fs/promises'
 import axios from 'axios'
 import core from '@actions/core'
 import { execa } from 'execa'
@@ -179,13 +179,12 @@ export class LimitPromise {
     info('adding gitee private key')
     await execa('ssh-add', ['-'], { input: GITEE_PRIVATE_KEY })
 
-    info('adding gitee.com to known_hosts')
+    info('configurating ssh')
     const sshDir = path.join(os.homedir(), '.ssh')
     await mkdir(sshDir)
-    const knownHostsFile = path.join(sshDir, 'known_hosts')
-    const { stdout } = await execa('ssh-keyscan', ['gitee.com'])
-    await appendFile(knownHostsFile, stdout)
-    await chmod(knownHostsFile, '644')
+    const sshConfigFile = path.join(sshDir, 'config')
+    await writeFile(sshConfigFile, 'StrictHostKeyChecking no\n')
+    await chmod(sshConfigFile, '644')
 
     info('setting git timeout')
     await execa('git', ['config', '--global', 'http.lowSpeedLimit', '1000'])

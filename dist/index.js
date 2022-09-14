@@ -21428,13 +21428,12 @@ class LimitPromise {
         coreExports.exportVariable('SSH_AUTH_SOCK', '/tmp/ssh-auth.sock');
         info('adding gitee private key');
         await execa('ssh-add', ['-'], { input: GITEE_PRIVATE_KEY });
-        info('adding gitee.com to known_hosts');
+        info('configurating ssh');
         const sshDir = require$$0__default$3["default"].join(require$$0__default$5["default"].homedir(), '.ssh');
         await promises.mkdir(sshDir);
-        const knownHostsFile = require$$0__default$3["default"].join(sshDir, 'known_hosts');
-        const { stdout } = await execa('ssh-keyscan', ['gitee.com']);
-        await promises.appendFile(knownHostsFile, stdout);
-        await promises.chmod(knownHostsFile, '644');
+        const sshConfigFile = require$$0__default$3["default"].join(sshDir, 'config');
+        await promises.writeFile(sshConfigFile, 'StrictHostKeyChecking no\n');
+        await promises.chmod(sshConfigFile, '644');
         info('setting git timeout');
         await execa('git', ['config', '--global', 'http.lowSpeedLimit', '1000']);
         await execa('git', ['config', '--global', 'http.lowSpeedTime', '60']);
