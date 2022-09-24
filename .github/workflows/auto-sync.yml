@@ -5,12 +5,11 @@ on:
     - cron: '0 16 * * *'
 
 jobs:
-  build:
+  sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - name: sync repos
-        uses: ./
+      - name: sync
+        uses: sunn4room/sync2gitee@main
         with:
           repositories: |
             ohmyzsh/ohmyzsh
