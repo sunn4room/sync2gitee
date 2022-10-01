@@ -27,6 +27,7 @@ jobs:
             vuejs/core->vue3
             plantuml/plantuml
             facebook/react
+            spring-projects/spring-framework
           gitee-private-key: ${{ secrets.GITEE_PRIVATE_KEY }}
           gitee-token: ${{ secrets.GITEE_TOKEN }}
           gitee-org: sunn4mirror
