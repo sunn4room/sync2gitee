@@ -28,6 +28,7 @@ jobs:
             plantuml/plantuml
             facebook/react
             spring-projects/spring-framework
+            adambard/learnxinyminutes-docs->learnxiny
           gitee-private-key: ${{ secrets.GITEE_PRIVATE_KEY }}
           gitee-token: ${{ secrets.GITEE_TOKEN }}
           gitee-org: sunn4mirror
