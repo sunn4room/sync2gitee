@@ -12,23 +12,8 @@ jobs:
         uses: sunn4room/sync2gitee@main
         with:
           repositories: |
-            ohmyzsh/ohmyzsh
-            zsh-users/zsh-completions
-            zsh-users/zsh-syntax-highlighting
-            zsh-users/zsh-autosuggestions
-            morhetz/gruvbox
-            vim-airline/vim-airline
-            tpope/vim-commentary
-            easymotion/vim-easymotion
             junegunn/fzf.vim
-            iamcco/markdown-preview.nvim
-            neoclide/coc.nvim@release
-            Ulauncher/Ulauncher@v6
-            vuejs/core->vue3
-            plantuml/plantuml
-            facebook/react
-            spring-projects/spring-framework
-            adambard/learnxinyminutes-docs->learnxiny
+            folke/lazy.nvim
           gitee-private-key: ${{ secrets.GITEE_PRIVATE_KEY }}
           gitee-token: ${{ secrets.GITEE_TOKEN }}
           gitee-org: sunn4mirror
