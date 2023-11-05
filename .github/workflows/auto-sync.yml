@@ -12,8 +12,8 @@ jobs:
         uses: sunn4room/sync2gitee@main
         with:
           repositories: |
-            junegunn/fzf.vim
+            folke/which-key.vim
             folke/lazy.nvim
           gitee-private-key: ${{ secrets.GITEE_PRIVATE_KEY }}
           gitee-token: ${{ secrets.GITEE_TOKEN }}
-          gitee-org: sunn4mirror
+          gitee-org: sunn4github
